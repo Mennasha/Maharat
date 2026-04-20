@@ -66,12 +66,6 @@ Route::middleware(['auth','admin'])->prefix('admin')->name('admin.')->group(func
     Route::resource('/prices', App\Http\Controllers\Admin\NationalityPriceController::class)->except(['show']);
     Route::get('/settings', [App\Http\Controllers\Admin\SettingController::class, 'index'])->name('settings.index');
     Route::post('/settings', [App\Http\Controllers\Admin\SettingController::class, 'update'])->name('settings.update');
-    Route::get('/contact-requests', function () {
-        $requests = \App\Models\ContactRequest::latest()->paginate(20);
-        return view('admin.contact_requests.index', compact('requests'));
-    })->name('contact-requests.index');
-    Route::post('/contact-requests/{id}/read', function ($id) {
-        \App\Models\ContactRequest::findOrFail($id)->update(['is_read' => true]);
-        return back()->with('success', 'تم تحديد الرسالة كمقروءة');
-    })->name('contact-requests.read');
+    Route::get('/contact-requests', [App\Http\Controllers\Admin\ContactRequestController::class, 'index'])->name('contact-requests.index');
+    Route::post('/contact-requests/{contactRequest}/read', [App\Http\Controllers\Admin\ContactRequestController::class, 'markRead'])->name('contact-requests.read');
 });

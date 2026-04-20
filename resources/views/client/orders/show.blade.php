@@ -86,7 +86,7 @@
                                 @endif
                             </div>
                             @if(!$loop->last)
-                                <div class="w-0.5 h-full mt-1 {{ $done && $idx < $currentIdx ? 'bg-blue-600' : 'bg-gray-200' }} flex-1 min-h-6"></div>
+                                <div class="w-0.5 h-full mt-1 {{ $idx < $currentIdx ? 'bg-blue-600' : 'bg-gray-200' }} flex-1 min-h-6"></div>
                             @endif
                         </div>
                         <div class="pt-1">

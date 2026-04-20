@@ -120,7 +120,7 @@ class InstallController extends Controller {
         }
 
         try {
-            // Write .env
+            // Write .env (includes freshly generated APP_KEY)
             $envContent = $this->buildEnv($appName, $appUrl, $appTz, $dbHost, $dbName, $dbUser, $dbPass);
             file_put_contents(base_path('.env'), $envContent);
 
@@ -137,9 +137,6 @@ class InstallController extends Controller {
             ]);
             DB::purge('mysql');
             DB::reconnect('mysql');
-
-            // Generate app key
-            Artisan::call('key:generate', ['--force' => true]);
 
             // Run migrations
             Artisan::call('migrate', ['--force' => true]);
