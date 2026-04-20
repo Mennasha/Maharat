@@ -4,9 +4,14 @@
 
 @section('content')
 <div class="max-w-5xl mx-auto px-4 py-10">
-    <div class="mb-8">
-        <h1 class="text-3xl font-bold text-gray-800">مرحباً، {{ auth()->user()->name }} 👋</h1>
-        <p class="text-gray-500 mt-1">هذه لوحة تحكم حسابك الشخصي</p>
+    <div class="flex justify-between items-start mb-8">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-800">مرحباً، {{ auth()->user()->name }} 👋</h1>
+            <p class="text-gray-500 mt-1">هذه لوحة تحكم حسابك الشخصي</p>
+        </div>
+        <a href="{{ route('client.orders.create') }}" class="bg-blue-600 text-white px-5 py-2.5 rounded-lg hover:bg-blue-700 transition font-medium">
+            + طلب جديد
+        </a>
     </div>
 
     @if($client)
@@ -53,16 +58,21 @@
                 <div class="grid grid-cols-2 md:grid-cols-3 gap-3 mt-4 text-sm">
                     <div>
                         <span class="text-gray-500">المبلغ الإجمالي:</span>
-                        <span class="font-bold mr-1">{{ number_format($order->total_amount) }} ريال</span>
+                        <span class="font-bold me-1">{{ number_format($order->total_amount) }} ريال</span>
                     </div>
                     <div>
                         <span class="text-gray-500">المدفوع:</span>
-                        <span class="font-bold text-green-600 mr-1">{{ number_format($order->paid_amount) }} ريال</span>
+                        <span class="font-bold text-green-600 me-1">{{ number_format($order->paid_amount) }} ريال</span>
                     </div>
                     <div>
                         <span class="text-gray-500">تاريخ الطلب:</span>
-                        <span class="font-bold mr-1">{{ $order->created_at->format('Y/m/d') }}</span>
+                        <span class="font-bold me-1">{{ $order->created_at->format('Y/m/d') }}</span>
                     </div>
+                </div>
+                <div class="mt-3">
+                    <a href="{{ route('client.orders.show', $order) }}" class="text-blue-600 hover:underline text-sm font-medium">
+                        عرض التفاصيل وتتبع الطلب ←
+                    </a>
                 </div>
             </div>
             @endforeach
