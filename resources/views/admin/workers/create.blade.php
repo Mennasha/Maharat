@@ -16,7 +16,7 @@
             </div>
         @endif
 
-        <form method="POST" action="{{ route('admin.workers.store') }}" class="space-y-5">
+        <form method="POST" action="{{ route('admin.workers.store') }}" class="space-y-5" enctype="multipart/form-data">
             @csrf
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -83,6 +83,13 @@
                         <option value="unavailable" {{ old('status') == 'unavailable' ? 'selected' : '' }}>غير متاحة</option>
                     </select>
                 </div>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">صورة العاملة</label>
+                <input type="file" name="photo" accept="image/*"
+                       class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+                <p class="text-xs text-gray-400 mt-1">JPEG / PNG - حجم أقصى 2 ميغابايت</p>
             </div>
 
             <div>

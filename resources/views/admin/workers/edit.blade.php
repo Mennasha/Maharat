@@ -16,7 +16,7 @@
             </div>
         @endif
 
-        <form method="POST" action="{{ route('admin.workers.update', $worker) }}" class="space-y-5">
+        <form method="POST" action="{{ route('admin.workers.update', $worker) }}" class="space-y-5" enctype="multipart/form-data">
             @csrf @method('PUT')
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -83,6 +83,19 @@
                         <option value="unavailable" {{ old('status', $worker->status) == 'unavailable' ? 'selected' : '' }}>غير متاحة</option>
                     </select>
                 </div>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">صورة العاملة</label>
+                @if($worker->photo)
+                    <div class="mb-2 flex items-center gap-3">
+                        <img src="{{ asset('storage/'.$worker->photo) }}" alt="الصورة الحالية" class="w-16 h-16 rounded-lg object-cover border">
+                        <span class="text-xs text-gray-500">الصورة الحالية — اختر صورة جديدة للتغيير</span>
+                    </div>
+                @endif
+                <input type="file" name="photo" accept="image/*"
+                       class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+                <p class="text-xs text-gray-400 mt-1">JPEG / PNG - حجم أقصى 2 ميغابايت</p>
             </div>
 
             <div>

@@ -7,7 +7,8 @@ use Illuminate\Http\Request;
 
 class WorkerController extends Controller {
     public function index() {
-        $workers = Worker::latest()->paginate(20);
+        $workers = Worker::when(request('search'), fn($q) => $q->where('name','like','%'.request('search').'%')->orWhere('nationality','like','%'.request('search').'%'))
+            ->latest()->paginate(20)->withQueryString();
         return view('admin.workers.index', compact('workers'));
     }
 
@@ -30,6 +31,7 @@ class WorkerController extends Controller {
             'status' => 'required|in:available,reserved,unavailable',
             'is_featured' => 'nullable|boolean',
             'notes' => 'nullable|string',
+            'photo' => 'nullable|image|max:2048',
         ]);
 
         $validated['previous_countries'] = $request->previous_countries
@@ -39,6 +41,10 @@ class WorkerController extends Controller {
             ? array_filter(explode(',', $request->skills))
             : [];
         $validated['is_featured'] = $request->has('is_featured');
+
+        if ($request->hasFile('photo')) {
+            $validated['photo'] = $request->file('photo')->store('workers', 'public');
+        }
 
         Worker::create($validated);
 
@@ -65,6 +71,7 @@ class WorkerController extends Controller {
             'status' => 'required|in:available,reserved,unavailable',
             'is_featured' => 'nullable|boolean',
             'notes' => 'nullable|string',
+            'photo' => 'nullable|image|max:2048',
         ]);
 
         $validated['previous_countries'] = $request->previous_countries
@@ -74,6 +81,13 @@ class WorkerController extends Controller {
             ? array_filter(explode(',', $request->skills))
             : [];
         $validated['is_featured'] = $request->has('is_featured');
+
+        if ($request->hasFile('photo')) {
+            if ($worker->photo) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($worker->photo);
+            }
+            $validated['photo'] = $request->file('photo')->store('workers', 'public');
+        }
 
         $worker->update($validated);
 

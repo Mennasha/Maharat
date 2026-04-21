@@ -13,11 +13,13 @@ class LandingController extends Controller {
         $testimonials = Testimonial::where('is_active', true)->take(6)->get();
         $partners = Partner::where('is_active', true)->get();
         $services = Service::where('is_active', true)->get();
+        $nationalities = Worker::where('is_featured', true)->where('status','available')
+            ->distinct()->pluck('nationality')->filter()->values();
         $stats = [
             'available_workers' => Worker::where('status','available')->count(),
             'happy_clients' => \App\Models\Client::count(),
             'avg_arrival_days' => 21,
         ];
-        return view('landing.index', compact('featuredWorkers','testimonials','partners','services','stats'));
+        return view('landing.index', compact('featuredWorkers','testimonials','partners','services','stats','nationalities'));
     }
 }

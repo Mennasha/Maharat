@@ -111,24 +111,43 @@
                 </div>
                 @endif
 
-                {{-- CTA Buttons --}}
-                @if($worker->status == 'available')
-                <div class="flex flex-wrap gap-3 mt-6">
-                    <a href="{{ route('login') }}"
-                       class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition font-bold">
-                        📋 احجز الآن
-                    </a>
-                    <a href="https://wa.me/966500000000?text=أريد الاستفسار عن العاملة: {{ urlencode($worker->name) }}"
-                       target="_blank"
-                       class="bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-600 transition font-bold">
-                        💬 تواصل عبر واتساب
-                    </a>
-                </div>
-                @else
-                <div class="mt-6 bg-gray-100 text-gray-500 px-6 py-3 rounded-lg text-center font-medium">
-                    هذه العاملة غير متاحة حالياً
-                </div>
-                @endif
+                    @auth
+                        @if($worker->status == 'available')
+                        <div class="flex flex-wrap gap-3 mt-6">
+                            <a href="{{ route('client.orders.create', ['worker_id' => $worker->id]) }}"
+                               class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition font-bold">
+                                📋 احجز الآن
+                            </a>
+                            <a href="https://wa.me/{{ \App\Models\Setting::get('site_whatsapp','966500000000') }}?text=أريد الاستفسار عن العاملة: {{ urlencode($worker->name) }}"
+                               target="_blank"
+                               class="bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-600 transition font-bold">
+                                💬 تواصل عبر واتساب
+                            </a>
+                        </div>
+                        @else
+                        <div class="mt-6 bg-gray-100 text-gray-500 px-6 py-3 rounded-lg text-center font-medium">
+                            هذه العاملة غير متاحة حالياً
+                        </div>
+                        @endif
+                    @else
+                        @if($worker->status == 'available')
+                        <div class="flex flex-wrap gap-3 mt-6">
+                            <a href="{{ route('login') }}"
+                               class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition font-bold">
+                                📋 سجّل دخولك للحجز
+                            </a>
+                            <a href="https://wa.me/{{ \App\Models\Setting::get('site_whatsapp','966500000000') }}?text=أريد الاستفسار عن العاملة: {{ urlencode($worker->name) }}"
+                               target="_blank"
+                               class="bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-600 transition font-bold">
+                                💬 تواصل عبر واتساب
+                            </a>
+                        </div>
+                        @else
+                        <div class="mt-6 bg-gray-100 text-gray-500 px-6 py-3 rounded-lg text-center font-medium">
+                            هذه العاملة غير متاحة حالياً
+                        </div>
+                        @endif
+                    @endauth
             </div>
         </div>
 
