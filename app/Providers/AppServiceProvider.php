@@ -2,7 +2,9 @@
 
 namespace App\Providers;
 
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
+use App\Models\ContactRequest;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -19,6 +21,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        // Share unread contact-request count with all admin views
+        View::composer('layouts.admin', function ($view) {
+            $view->with('unreadCount', ContactRequest::where('is_read', false)->count());
+        });
     }
 }

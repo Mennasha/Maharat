@@ -36,7 +36,7 @@
             <form action="{{ route('workers.index') }}" method="GET" class="flex flex-col sm:flex-row gap-3">
                 <select name="nationality" class="flex-1 bg-white border-0 rounded-lg px-4 py-3 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm">
                     <option value="">🌍 اختر الجنسية</option>
-                    @foreach($featuredWorkers->pluck('nationality')->unique()->filter() as $nat)
+                    @foreach($nationalities as $nat)
                         <option value="{{ $nat }}">{{ $nat }}</option>
                     @endforeach
                 </select>
