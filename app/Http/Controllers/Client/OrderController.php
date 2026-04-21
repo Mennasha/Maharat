@@ -2,11 +2,14 @@
 namespace App\Http\Controllers\Client;
 
 use App\Http\Controllers\Controller;
+use App\Mail\OrderPlaced;
 use App\Models\Order;
 use App\Models\OrderTimeline;
 use App\Models\Worker;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 class OrderController extends Controller {
     public function create(Request $request) {
@@ -45,6 +48,15 @@ class OrderController extends Controller {
             'status' => 'contracted',
             'description' => 'تم إنشاء الطلب',
         ]);
+
+        try {
+            $order->load(['client', 'worker']);
+            if ($order->client?->user?->email) {
+                Mail::to($order->client->user->email)->send(new OrderPlaced($order));
+            }
+        } catch (\Exception $e) {
+            Log::error('Failed to send order confirmation email for order #' . $order->id . ': ' . $e->getMessage());
+        }
 
         return redirect()->route('client.orders.show', $order)->with('success', 'تم إرسال طلبك بنجاح، سيتواصل معك فريقنا قريباً.');
     }

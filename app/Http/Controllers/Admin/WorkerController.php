@@ -7,7 +7,8 @@ use Illuminate\Http\Request;
 
 class WorkerController extends Controller {
     public function index() {
-        $workers = Worker::latest()->paginate(20);
+        $workers = Worker::when(request('search'), fn($q) => $q->where('name','like','%'.request('search').'%')->orWhere('nationality','like','%'.request('search').'%'))
+            ->latest()->paginate(20)->withQueryString();
         return view('admin.workers.index', compact('workers'));
     }
 

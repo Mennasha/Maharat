@@ -9,6 +9,7 @@
         @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&display=swap');
         body { font-family: 'Tajawal', sans-serif; }
     </style>
+    @stack('styles')
 </head>
 <body class="bg-gray-50 text-gray-800">
 
@@ -18,6 +19,10 @@
             <div class="flex justify-between items-center h-16">
                 <a href="{{ route('home') }}" class="text-2xl font-extrabold text-blue-700">مهارات للاستقدام</a>
                 <div class="hidden md:flex items-center gap-6 text-sm font-medium">
+                    <button id="dark-toggle" onclick="toggleDark()" class="p-2 rounded-lg text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700 transition" title="تبديل الوضع">
+                        <svg id="dark-icon-sun" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M17.657 17.657l-.707-.707M6.343 6.343l-.707-.707M12 7a5 5 0 100 10 5 5 0 000-10z"/></svg>
+                        <svg id="dark-icon-moon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+                    </button>
                     <a href="{{ route('home') }}" class="hover:text-blue-600 transition">الرئيسية</a>
                     <a href="{{ route('workers.index') }}" class="hover:text-blue-600 transition">العمالة</a>
                     <a href="{{ route('services') }}" class="hover:text-blue-600 transition">خدماتنا</a>
@@ -65,20 +70,13 @@
         </div>
     </nav>
 
-    <!-- Flash Messages -->
+    <!-- Toast Notifications -->
+    <div id="toast-container" class="fixed top-4 left-1/2 -translate-x-1/2 z-[9999] flex flex-col gap-2 w-full max-w-sm px-4 pointer-events-none"></div>
     @if(session('success'))
-        <div class="max-w-7xl mx-auto px-4 mt-4">
-            <div class="bg-green-100 border border-green-400 text-green-800 px-4 py-3 rounded-lg">
-                {{ session('success') }}
-            </div>
-        </div>
+    <script>window.__toasts = window.__toasts||[];window.__toasts.push({type:'success',msg:{{ Js::from(session('success')) }}});</script>
     @endif
     @if(session('error'))
-        <div class="max-w-7xl mx-auto px-4 mt-4">
-            <div class="bg-red-100 border border-red-400 text-red-800 px-4 py-3 rounded-lg">
-                {{ session('error') }}
-            </div>
-        </div>
+    <script>window.__toasts = window.__toasts||[];window.__toasts.push({type:'error',msg:{{ Js::from(session('error')) }}});</script>
     @endif
 
     <!-- Content -->
@@ -135,5 +133,43 @@
             </div>
         </div>
     </footer>
+    @stack('scripts')
+    <script>
+    (function(){
+        function showToast(type,msg){
+            var c=document.getElementById('toast-container');
+            var t=document.createElement('div');
+            var isSuccess=type==='success';
+            t.className='pointer-events-auto flex items-center gap-3 px-5 py-3 rounded-xl shadow-lg text-sm font-medium transition-all duration-300 opacity-0 translate-y-2 '+(isSuccess?'bg-green-500 text-white':'bg-red-500 text-white');
+            t.innerHTML='<svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="'+(isSuccess?'M5 13l4 4L19 7':'M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z')+'"/></svg><span class="flex-1">'+msg+'</span><button onclick="this.parentElement.remove()" class="opacity-70 hover:opacity-100 text-lg leading-none">&times;</button>';
+            c.appendChild(t);
+            requestAnimationFrame(function(){t.classList.remove('opacity-0','translate-y-2');});
+            setTimeout(function(){t.classList.add('opacity-0');setTimeout(function(){t.remove();},300);},4000);
+        }
+        document.addEventListener('DOMContentLoaded',function(){
+            (window.__toasts||[]).forEach(function(n){showToast(n.type,n.msg);});
+        });
+    })();
+    </script>
+    <script>
+    function toggleDark() {
+        var html = document.documentElement;
+        html.classList.toggle('dark');
+        localStorage.setItem('darkMode', html.classList.contains('dark') ? '1' : '0');
+        document.getElementById('dark-icon-sun').classList.toggle('hidden', !html.classList.contains('dark'));
+        document.getElementById('dark-icon-moon').classList.toggle('hidden', html.classList.contains('dark'));
+    }
+    (function() {
+        var stored = localStorage.getItem('darkMode');
+        var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        if (stored === '1' || (stored === null && prefersDark)) {
+            document.documentElement.classList.add('dark');
+            var sun = document.getElementById('dark-icon-sun');
+            var moon = document.getElementById('dark-icon-moon');
+            if(sun) { sun.classList.remove('hidden'); }
+            if(moon) { moon.classList.add('hidden'); }
+        }
+    })();
+    </script>
 </body>
 </html>

@@ -1,13 +1,28 @@
 @extends('layouts.app')
 @section('title', 'تفاصيل الطلب #' . $order->id)
 
+@push('styles')
+<style>
+@media print {
+    nav, footer, .print-hide { display: none !important; }
+    body { background: white !important; }
+    .print-card { box-shadow: none !important; border: 1px solid #e5e7eb !important; }
+    .print-btn { display: none !important; }
+}
+</style>
+@endpush
+
 @section('content')
 <div class="max-w-3xl mx-auto px-4 py-10">
-    <div class="mb-6">
+    <div class="mb-6 flex items-center gap-3">
         <a href="{{ route('client.dashboard') }}" class="text-blue-600 hover:underline text-sm">← العودة إلى حسابي</a>
+        <button onclick="window.print()" class="print-btn text-sm text-gray-500 hover:text-gray-700 flex items-center gap-1 border border-gray-300 px-3 py-1.5 rounded-lg hover:bg-gray-50 transition">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+            طباعة
+        </button>
     </div>
 
-    <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+    <div class="bg-white rounded-2xl shadow-lg overflow-hidden print-card">
         {{-- Header --}}
         <div class="bg-gradient-to-l from-blue-700 to-blue-600 text-white p-6">
             <div class="flex justify-between items-start">

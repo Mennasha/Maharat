@@ -87,33 +87,46 @@
 
         <!-- Main Content (RTL: margin on the left = ml-64) -->
         <div class="flex-1 ml-64">
-            <!-- Top Header -->
-            <header class="bg-white shadow-sm px-6 py-4 flex justify-between items-center sticky top-0 z-30">
-                <h1 class="text-lg font-bold text-gray-700">@yield('page-title', 'لوحة التحكم')</h1>
+        <!-- Top Header -->
+        <header class="bg-white shadow-sm px-6 py-3 sticky top-0 z-30">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h1 class="text-base font-bold text-gray-800">@yield('page-title', 'لوحة التحكم')</h1>
+                    <nav class="text-xs text-gray-400 mt-0.5">
+                        <a href="{{ route('admin.dashboard') }}" class="hover:text-blue-600 transition">الرئيسية</a>
+                        @hasSection('breadcrumb')
+                            <span class="mx-1">›</span>
+                            @yield('breadcrumb')
+                        @endif
+                    </nav>
+                </div>
                 <div class="flex items-center gap-3">
-                    <a href="{{ route('home') }}" target="_blank" class="text-sm text-gray-500 hover:text-blue-600 transition">
+                    <a href="{{ route('home') }}" target="_blank" class="text-sm text-gray-400 hover:text-blue-600 transition hidden sm:block">
                         عرض الموقع ↗
                     </a>
-                    <span class="text-gray-300">|</span>
-                    <span class="font-medium text-gray-800">{{ auth()->user()->name }}</span>
-                    <span class="bg-blue-100 text-blue-700 text-xs px-2 py-1 rounded-full">
+                    {{-- Notification Bell --}}
+                    @php $unreadCount = \App\Models\ContactRequest::where('is_read', false)->count(); @endphp
+                    <a href="{{ route('admin.contact-requests.index') }}" class="relative p-2 text-gray-500 hover:text-blue-600 transition rounded-lg hover:bg-gray-100">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+                        @if($unreadCount > 0)
+                        <span class="absolute -top-0.5 -end-0.5 w-4 h-4 bg-red-500 text-white text-[10px] rounded-full flex items-center justify-center font-bold">{{ $unreadCount > 9 ? '9+' : $unreadCount }}</span>
+                        @endif
+                    </a>
+                    <span class="text-gray-300 hidden sm:block">|</span>
+                    <span class="font-medium text-gray-800 text-sm">{{ auth()->user()->name }}</span>
+                    <span class="bg-blue-100 text-blue-700 text-xs px-2 py-1 rounded-full hidden sm:block">
                         {{ auth()->user()->role === 'super_admin' ? 'مدير عام' : 'مدير' }}
                     </span>
                 </div>
-            </header>
+            </div>
+        </header>
 
-            <!-- Flash Messages -->
+            <!-- Toast session data -->
             @if(session('success'))
-                <div class="mx-6 mt-4 bg-green-100 border border-green-400 text-green-800 px-4 py-3 rounded-lg flex items-center gap-2">
-                    <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                    {{ session('success') }}
-                </div>
+            <script>window.__toasts = window.__toasts||[];window.__toasts.push({type:'success',msg:{{ Js::from(session('success')) }}});</script>
             @endif
             @if(session('error'))
-                <div class="mx-6 mt-4 bg-red-100 border border-red-400 text-red-800 px-4 py-3 rounded-lg flex items-center gap-2">
-                    <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                    {{ session('error') }}
-                </div>
+            <script>window.__toasts = window.__toasts||[];window.__toasts.push({type:'error',msg:{{ Js::from(session('error')) }}});</script>
             @endif
 
             <main class="p-6">
@@ -121,5 +134,23 @@
             </main>
         </div>
     </div>
+    <div id="toast-container" class="fixed top-4 left-1/2 -translate-x-1/2 z-[9999] flex flex-col gap-2 w-full max-w-sm px-4 pointer-events-none"></div>
+    <script>
+    (function(){
+        function showToast(type,msg){
+            var c=document.getElementById('toast-container');
+            var t=document.createElement('div');
+            var isSuccess=type==='success';
+            t.className='pointer-events-auto flex items-center gap-3 px-5 py-3 rounded-xl shadow-lg text-sm font-medium transition-all duration-300 opacity-0 translate-y-2 '+(isSuccess?'bg-green-500 text-white':'bg-red-500 text-white');
+            t.innerHTML='<svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="'+(isSuccess?'M5 13l4 4L19 7':'M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z')+'"/></svg><span class="flex-1">'+msg+'</span><button onclick="this.parentElement.remove()" class="opacity-70 hover:opacity-100 text-lg leading-none">&times;</button>';
+            c.appendChild(t);
+            requestAnimationFrame(function(){t.classList.remove('opacity-0','translate-y-2');});
+            setTimeout(function(){t.classList.add('opacity-0');setTimeout(function(){t.remove();},300);},4000);
+        }
+        document.addEventListener('DOMContentLoaded',function(){
+            (window.__toasts||[]).forEach(function(n){showToast(n.type,n.msg);});
+        });
+    })();
+    </script>
 </body>
 </html>
